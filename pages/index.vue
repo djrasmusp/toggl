@@ -1,35 +1,39 @@
 <template>
-  <div>
-    <h1>Get Toggl data</h1>
-    <form novalidate @submit.prevent="login">
+  <div class="container mx-auto">
+    <form novalidate @submit.prevent="login" class="mb-8 bg-gray-100 p-8 flex flex-col gap-4 max-w-sm mx-auto">
+      <h1 class="font-bold text-2xl">Get Toggl data</h1>
       <div>
-        <label for="email">Email:</label>
-        <input type="text" name="email" id="email" v-model="email"/>
+        <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
+        <div class="mt-2">
+          <input type="email" name="email" id="email" v-model="email" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="you@example.com" />
+        </div>
       </div>
       <div>
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password" v-model="password" />
+        <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
+        <div class="mt-2">
+          <input type="password" name="email" id="email" v-model="password" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="password" />
+        </div>
       </div>
-      <input type="submit" value="Login">
+      <button type="submit" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Login</button>
     </form>
     <div v-for="project in projects">
-      <h2>{{ project.name}} <small>{{ project.id}}</small></h2>
-      <table width="100%" border="1">
-        <thead>
-        <tr>
-          <th>Description</th>
-          <th width="10%">Monday</th>
-          <th width="10%">Tuesday</th>
-          <th width="10%">Wedsday</th>
-          <th width="10%">Thursday</th>
-          <th width="10%">Friday</th>
-          <th width="10%">Saturday</th>
-          <th width="10%">Sunday</th>
+      <h2 class="text-2xl font-semibold mb-2">{{ project.name}}</h2>
+      <table class="min-w-full divide-y divide-gray-300 mb-8">
+        <thead class="bg-gray-50">
+        <tr class="divide-x divide-gray-300">
+          <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Description</th>
+          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Monday</th>
+          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tuesday</th>
+          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Wedsday</th>
+          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Thursday</th>
+          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Friday</th>
+          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Saturday</th>
+          <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Sunday</th>
         </tr>
         </thead>
-        <tr v-for="entry in groupByDescriptionAndWeek(getEntries(project.id ))">
-          <td>{{ entry.description }}</td>
-          <td v-for="day in entry.dates" align="right">{{ day.duration ? parseFloat(day.duration).toFixed(2) : 0 }}</td>
+        <tr v-for="entry in groupByDescriptionAndWeek(getEntries(project.id ))" class="even:bg-gray-50 divide-x">
+          <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{ entry.description }}</td>
+          <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 tabular-nums" v-for="day in entry.dates" align="right">{{ day.duration ? parseFloat(day.duration).toFixed(2) : '-' }}</td>
         </tr>
 
       </table>
