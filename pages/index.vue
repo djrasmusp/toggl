@@ -85,7 +85,7 @@ const groupByDescriptionAndWeek = (entries: Entry[]) => {
     const diffInDays = (today.getTime() - entryDate.getTime()) / (1000 * 3600 * 24);
 
     // Kun inkludér datoer der er indenfor de sidste 8 dage
-    if (diffInDays <= 8) {
+    if (diffInDays <= 7) {
       const dayOfWeek = formatDayOfWeek(entry.start);
       const description = entry.description;
 
