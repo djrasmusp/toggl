@@ -19,7 +19,6 @@
 
     <div class="mx-auto my-8 max-w-sm" v-if="projects?.length > 0">
       <vue-date-picker v-model="dateRange" week-picker />
-      <pre>{{ dateRange}}</pre>
     </div>
 
     <div v-for="project in projects">
