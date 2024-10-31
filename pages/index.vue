@@ -22,6 +22,7 @@
     </div>
 
     <div v-for="project in projects">
+      <div v-if="getEntries(project.id ).length > 0">
       <h2 class="text-2xl font-semibold mb-2">{{ project.name}}</h2>
       <table class="min-w-full divide-y divide-gray-300 mb-8">
         <thead class="bg-gray-50">
@@ -42,6 +43,7 @@
         </tr>
 
       </table>
+    </div>
     </div>
   </div>
 </template>
