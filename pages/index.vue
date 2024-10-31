@@ -16,6 +16,12 @@
       </div>
       <button type="submit" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Login</button>
     </form>
+
+    <div class="mx-auto my-8 max-w-sm">
+      <vue-date-picker v-model="dateRange" week-picker />
+      <pre>{{ dateRange}}</pre>
+    </div>
+
     <div v-for="project in projects">
       <h2 class="text-2xl font-semibold mb-2">{{ project.name}}</h2>
       <table class="min-w-full divide-y divide-gray-300 mb-8">
@@ -43,12 +49,16 @@
 
 <script setup lang="ts">
 import {$fetch} from "ofetch";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 const email = ref()
 const password = ref()
 
 const projects = ref([])
 const time_entries = ref([])
+
+const dateRange = ref<string[] | undefined >([Date.now(), Date.now()])
 
 async function login(){
 
@@ -64,28 +74,39 @@ async function login(){
   time_entries.value = data.time_entries
 }
 
-function getEntries(project_id: number){
-  return time_entries.value.filter(entry => entry.project_id === project_id)
+watch(dateRange, (newRange) => {
+  if (newRange) {
+    updateProjects();
+  }
+});
+
+function getEntries(project_id: number) {
+  return time_entries.value.filter(entry => entry.project_id === project_id);
+}
+
+function updateProjects() {
+  projects.value = projects.value.map(project => ({
+    ...project,
+    entries: groupByDescriptionAndWeek(getEntries(project.id)),
+  }));
 }
 
 const formatDayOfWeek = (dateStr: string) => {
   const date = new Date(dateStr);
   const options: Intl.DateTimeFormatOptions = { weekday: 'long' };
-  return new Intl.DateTimeFormat('en-US', options).format(date); // Returner ugedagen som navn (fx. "Monday")
+  return new Intl.DateTimeFormat('en-US', options).format(date);
 };
 
-// Funktion til at filtrere datoer ældre end 8 dage og gruppere efter beskrivelse og dato
+// Modify groupByDescriptionAndWeek to use dateRange for filtering entries
 const groupByDescriptionAndWeek = (entries: Entry[]) => {
   const result: { description: string; dates: { day: string; duration: number | null }[] }[] = [];
-
-  const today = new Date();
+  const [startDate, endDate] = dateRange.value!.map(date => new Date(date));
 
   const groupedByDescription = entries.reduce((acc: any, entry) => {
     const entryDate = new Date(entry.start.split('T')[0]);
-    const diffInDays = (today.getTime() - entryDate.getTime()) / (1000 * 3600 * 24);
 
-    // Kun inkludér datoer der er indenfor de sidste 8 dage
-    if (diffInDays <= 8) {
+    // Only include dates within the selected range
+    if (entryDate >= startDate && entryDate <= endDate) {
       const dayOfWeek = formatDayOfWeek(entry.start);
       const description = entry.description;
 
@@ -93,25 +114,24 @@ const groupByDescriptionAndWeek = (entries: Entry[]) => {
         acc[description] = {
           description,
           dates: {
-            "Monday": null,
-            "Tuesday": null,
-            "Wednesday": null,
-            "Thursday": null,
-            "Friday": null,
-            "Saturday": null,
-            "Sunday": null,
+            Monday: null,
+            Tuesday: null,
+            Wednesday: null,
+            Thursday: null,
+            Friday: null,
+            Saturday: null,
+            Sunday: null,
           },
         };
       }
 
-      // Tilføj varighed for den pågældende dag
-      acc[description].dates[dayOfWeek] = (acc[description].dates[dayOfWeek] || 0) + entry.duration / 3600; // Konverter til decimal timer
+      // Add duration for the specific day
+      acc[description].dates[dayOfWeek] = (acc[description].dates[dayOfWeek] || 0) + entry.duration / 3600; // Convert to decimal hours
     }
 
     return acc;
   }, {});
 
-  // Omdan til det ønskede array-format
   for (const key in groupedByDescription) {
     const datesArray = Object.entries(groupedByDescription[key].dates).map(([day, duration]) => ({
       day,
@@ -126,6 +146,7 @@ const groupByDescriptionAndWeek = (entries: Entry[]) => {
 
   return result;
 };
+
 
 </script>
 
