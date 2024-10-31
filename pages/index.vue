@@ -58,7 +58,16 @@ const password = ref()
 const projects = ref([])
 const time_entries = ref([])
 
-const dateRange = ref<string[] | undefined >([Date.now(), Date.now()])
+const today = new Date();
+const dayOfWeek = today.getDay(); // Søndag = 0, Mandag = 1, ..., Lørdag = 6
+
+// Beregn startdato som mandag i denne uge
+const startOfWeek = new Date(today);
+startOfWeek.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // Hvis søndag, gå 6 dage tilbage, ellers til mandag
+
+// Initier dateRange med start af ugen (mandag) og dags dato
+const dateRange = ref<string[]>([startOfWeek.toISOString().split('T')[0], today.toISOString().split('T')[0]]);
+
 
 async function login(){
 
